@@ -13,10 +13,12 @@ url="http://openzfs.org/"
 source=("${zfs_src_target}"
         "zfs-utils.initcpio.install"
         "zfs-utils.initcpio.hook"
+        "zfs-utils.initcpio.tpm2-provider"
         "zfs-utils.initcpio.zfsencryptssh.install")
 sha256sums=("${zfs_src_hash}"
             "${zfs_initcpio_install_hash}"
             "${zfs_initcpio_hook_hash}"
+            "${zfs_initcpio_tpm2_provider_hash}"
             "${zfs_initcpio_zfsencryptssh_install}")
 license=("CDDL")
 
@@ -70,6 +72,7 @@ package_${zfs_utils_pkgname}() {
         "smartmontools: SMART health information in zpool status"
         "sudo: privilege escalation for SMART zpool status columns"
         "sysstat: I/O statistics in zpool status"
+        "tpm2-tss: TPM2 key provider support"
     )
     groups=("${archzfs_package_group}")
     provides=("zfs-utils" "spl-utils")
@@ -93,6 +96,9 @@ package_${zfs_utils_pkgname}() {
     # Install the support files
     install -D -m644 "\${srcdir}"/zfs-utils.initcpio.hook "\${pkgdir}"/usr/lib/initcpio/hooks/zfs
     install -D -m644 "\${srcdir}"/zfs-utils.initcpio.install "\${pkgdir}"/usr/lib/initcpio/install/zfs
+    install -D -m644 \\
+        "\${srcdir}"/zfs-utils.initcpio.tpm2-provider \\
+        "\${pkgdir}"/usr/share/doc/zfs-utils/initramfs-tools-load-key.d/tpm2-systemd-creds
     install -D -m644 "\${srcdir}"/zfs-utils.initcpio.zfsencryptssh.install "\${pkgdir}"/usr/lib/initcpio/install/zfsencryptssh
     install -D -m644 contrib/bash_completion.d/zfs "\${pkgdir}"/usr/share/bash-completion/completions/zfs
 
