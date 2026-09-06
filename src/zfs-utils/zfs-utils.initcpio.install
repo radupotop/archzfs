@@ -2,6 +2,8 @@
 
 build() {
     local load_key_file
+    local tpm2_lib
+    local tpm2_lib_file
 
     map add_module \
         zavl \
@@ -54,13 +56,18 @@ build() {
 
         if [[ -f /etc/zfs/initramfs-tools-load-key.d/tpm2-systemd-creds ]]; then
             add_binary systemd-creds
-            map add_file \
-                /usr/lib/libtss2-esys.so.0 \
-                /usr/lib/libtss2-mu.so.0 \
-                /usr/lib/libtss2-rc.so.0 \
-                /usr/lib/libtss2-sys.so.1 \
-                /usr/lib/libtss2-tcti-device.so.0 \
-                /usr/lib/libtss2-tctildr.so.0
+            add_checked_modules '/drivers/char/tpm/'
+
+            for tpm2_lib in tss2-{esys,rc,mu,tcti-device}; do
+                find /usr/lib/ -maxdepth 1 -name "lib${tpm2_lib}.so*" |
+                    while read -r tpm2_lib_file; do
+                        if [[ -L "${tpm2_lib_file}" ]]; then
+                            add_symlink "${tpm2_lib_file}"
+                        else
+                            add_binary "${tpm2_lib_file}"
+                        fi
+                    done
+            done
         fi
     fi
 
