@@ -12,6 +12,7 @@ zfs_try_load_key_provider() {
     local DATASET=$1
     local ENCRYPTIONROOT=$2
     local KEYLOCATION=$3
+    local BOOT_DATASET=$4
     local ZFS=zfs
     local ZPOOL=zpool
     local load_key_provider
@@ -104,7 +105,8 @@ zfs_decrypt_fs() {
     zfs_try_load_key_provider \
         "${dataset}" \
         "${encryptionroot}" \
-        "${keylocation}" || true
+        "${keylocation}" \
+        "${ZFS_DATASET}" || true
 
     # Loop until key is loaded here or by another vector (SSH, for instance)
     while [ "$(zfs get -H -o value keystatus "${encryptionroot}")" != "available" ]; do
