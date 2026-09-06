@@ -72,9 +72,14 @@ build() {
     fi
 
     if [[ -f /etc/zfs/initramfs-tools-load-key.files ]]; then
-        while read -r load_key_file; do
+        while IFS= read -r load_key_file || [[ -n "${load_key_file}" ]]; do
             [[ "${load_key_file}" = "" || "${load_key_file}" = "#"* ]] && continue
-            [[ -f "${load_key_file}" ]] && add_file "${load_key_file}"
+            if [[ -f "${load_key_file}" ]]; then
+                add_file "${load_key_file}"
+            else
+                error "ZFS key provider payload not found: %s" "${load_key_file}"
+                return 1
+            fi
         done < /etc/zfs/initramfs-tools-load-key.files
     fi
 }
