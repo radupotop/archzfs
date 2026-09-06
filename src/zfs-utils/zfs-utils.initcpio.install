@@ -1,7 +1,6 @@
 #!/bin/bash
 
 build() {
-    local load_key_file
     local tpm2_lib
     local tpm2_lib_file
 
@@ -72,17 +71,6 @@ build() {
         fi
     fi
 
-    if [[ -f /etc/zfs/initramfs-tools-load-key.files ]]; then
-        while IFS= read -r load_key_file || [[ -n "${load_key_file}" ]]; do
-            [[ "${load_key_file}" = "" || "${load_key_file}" = "#"* ]] && continue
-            if [[ -f "${load_key_file}" ]]; then
-                add_file "${load_key_file}"
-            else
-                error "ZFS key provider payload not found: %s" "${load_key_file}"
-                return 1
-            fi
-        done < /etc/zfs/initramfs-tools-load-key.files
-    fi
 }
 
 help() {
@@ -154,9 +142,8 @@ Alternate key loading:
         [ -r "${keyfile}" ] || return 1
         "${ZFS}" load-key -L prompt "${ENCRYPTIONROOT}" < "${keyfile}"
 
-    Additional payload files required by providers can be listed one per line
-    in /etc/zfs/initramfs-tools-load-key.files. Empty lines and lines starting
-    with # are ignored.
+    Additional payload files required by providers should be added through
+    mkinitcpio's FILES array.
 
 TPM2 provider:
 
@@ -174,9 +161,10 @@ TPM2 provider:
 
     /usr/share/doc/zfs-utils/initramfs-tools-load-key.d/tpm2-systemd-creds.
 
-    Then create a TPM2 credential at /etc/zfs/zfs-key.creds and list it in:
+    Then create a TPM2 credential at /etc/zfs/zfs-key.creds and add it to
+    mkinitcpio.conf:
 
-        /etc/zfs/initramfs-tools-load-key.files
+        FILES+=(/etc/zfs/zfs-key.creds)
 
     Avoid putting the ZFS passphrase directly in shell history. One option is
     to write it to a temporary file on /run, encrypt it, then remove it:
@@ -186,8 +174,6 @@ TPM2 provider:
         systemd-creds encrypt --with-key=tpm2 --tpm2-device=auto \
             --name=zfs-key /run/zfs.key /etc/zfs/zfs-key.creds
         rm /run/zfs.key
-        printf '%s\n' /etc/zfs/zfs-key.creds \
-            > /etc/zfs/initramfs-tools-load-key.files
 
     The default credential path is /etc/zfs/zfs-key.creds, and the default
     systemd-creds name is zfs-key. These can be changed with
