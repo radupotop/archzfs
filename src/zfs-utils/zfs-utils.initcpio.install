@@ -59,7 +59,8 @@ build() {
             add_checked_modules '/drivers/char/tpm/'
 
             for tpm2_lib in tss2-{esys,rc,mu,tcti-device}; do
-                find /usr/lib/ -maxdepth 1 -name "lib${tpm2_lib}.so*" |
+                LC_ALL=C.UTF-8 \
+                    find /usr/lib/ -maxdepth 1 -name "lib${tpm2_lib}.so*" |
                     while read -r tpm2_lib_file; do
                         if [[ -L "${tpm2_lib_file}" ]]; then
                             add_symlink "${tpm2_lib_file}"
