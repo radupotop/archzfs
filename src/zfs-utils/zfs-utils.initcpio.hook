@@ -9,11 +9,12 @@ ZPOOL_IMPORT_FLAGS=""
 ZFS_BOOT_ONLY=""
 
 zfs_try_load_key_provider() {
-    DATASET=$1
-    ENCRYPTIONROOT=$2
-    KEYLOCATION=$3
-    ZFS=zfs
-    ZPOOL=zpool
+    local DATASET=$1
+    local ENCRYPTIONROOT=$2
+    local KEYLOCATION=$3
+    local ZFS=zfs
+    local ZPOOL=zpool
+    local load_key_provider
 
     for load_key_provider in \
         /etc/zfs/initramfs-tools-load-key \
@@ -21,7 +22,7 @@ zfs_try_load_key_provider() {
         [ -f "${load_key_provider}" ] || continue
         [ -r "${load_key_provider}" ] || continue
 
-        if . "${load_key_provider}" &&
+        if (. "${load_key_provider}") &&
             [ "$(zfs get -H -o value keystatus "${ENCRYPTIONROOT}")" = "available" ]; then
             return 0
         fi
