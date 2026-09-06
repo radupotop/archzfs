@@ -8,10 +8,6 @@ ${zfs_set_commit}
 pkgver=${zfs_pkgver}
 pkgrel=${zfs_pkgrel}
 makedepends=("python" "python-setuptools" "python-cffi" "libaio" ${zfs_makedepends})
-optdepends=("python: pyzfs and extra utilities"
-            "python-cffi: pyzfs"
-            "systemd: TPM2 key provider support"
-            "tpm2-tss: TPM2 key provider support")
 arch=("x86_64")
 url="http://openzfs.org/"
 source=("${zfs_src_target}"
@@ -76,6 +72,7 @@ package_${zfs_utils_pkgname}() {
         "smartmontools: SMART health information in zpool status"
         "sudo: privilege escalation for SMART zpool status columns"
         "sysstat: I/O statistics in zpool status"
+        "tpm2-tss: TPM2 key provider support"
     )
     groups=("${archzfs_package_group}")
     provides=("zfs-utils" "spl-utils")
