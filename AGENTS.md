@@ -77,11 +77,12 @@
 - For mutable fixed-name releases, do not treat the release tag commit as
   immutable provenance; see **Operational Safety**. Identify signed assets by
   filename, package version, digest, and verified signature. Tie unsigned
-  `testing` assets to their source commit and workflow run as well as their
-  filename, version, and digest. Record whether each was built by that run or
-  reused from signed `failover`. For reused assets, record the verified failover
-  identity; they do not validate candidate package contents. Unsigned assets do
-  not validate production signing or published production contents.
+  pull-request workflow artifacts to their source and merge commits and workflow
+  run as well as their artifact name, filename, version, and digest. Record
+  whether each package was built by that run or reused from signed `failover`.
+  For reused assets, record the verified failover identity; they do not validate
+  candidate package contents. Unsigned assets do not validate production signing
+  or published production contents.
 - Record package identities and versions, artifact names and URLs, signature
   verification, digests, commits or tags, and discrepancies in durable task
   evidence and in any applicable pull request or review. Preserve conflicting
@@ -135,8 +136,8 @@
 - Although listed in `build.sh --help`, `test` and `update-test` are parsed but
   have no execution path. Do not report them as validation.
 - The Actions workflow named `Test` performs an unsigned package build and
-  updates the shared mutable `testing` release. It does not run the legacy
-  QEMU tests or an OpenZFS runtime/data-integrity suite.
+  retains its output as a short-lived workflow artifact. It does not run the
+  legacy QEMU tests or an OpenZFS runtime/data-integrity suite.
 - Long package-build checks may run automatically for changes that cannot affect
   their workflow, inputs, or outputs. After inspecting the changed paths and
   relevant workflow dependencies, do not wait synchronously merely for such a
@@ -162,11 +163,18 @@
 - Do not run `testing/test.sh` on an unreviewed environment. Guest setup wipes
   the test VM's `/dev/vda`, depends on hard-coded NFS resources, and has
   unfinished acceptance checks.
+- Pull-request workflows execute unreviewed contributor code in a privileged
+  container. Keep them free of repository write permissions, repository or
+  environment secrets, secret-bearing environments, persisted checkout
+  credentials, and authority to publish to organization-owned channels. Do not
+  assume every fork run is approval-gated; repository policy may allow some runs
+  to start automatically.
 - Do not force-sync `archzfs-testing` until active work is preserved and
   mutating workflows are disabled. `gh repo sync --force` hard-resets its target
   branch; follow `docs/staging.md` and verify the destination repository.
-- Releases and tags named `testing`, `experimental`, and `failover` are mutable
-  and may be force-moved. Do not use their tag commits as immutable provenance.
+- Releases and tags named `experimental` and `failover`, and any retained legacy
+  `testing` release and tag, are mutable and may be force-moved. Do not use their
+  tag commits as immutable provenance.
 - Preserve create-then-promote publication for fixed-name release channels. In
   addition to reducing exposure to incomplete uploads, creating a fresh release
   updates the date shown by GitHub; updating assets in place does not.

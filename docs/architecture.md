@@ -78,12 +78,14 @@ Creating a new release before renaming it gives users a meaningful publication
 date. Future fixed-name channels need to preserve both properties or replace
 them deliberately; the current sequence reduces risk but is not fully atomic.
 
-The fixed names are channels rather than immutable versions:
+The fixed release names are channels rather than immutable versions:
 
 - `experimental`: current signed public Pacman repository.
 - `failover`: signed prior/current package pool used to keep a repository
   publishable when an individual kernel-module build fails.
-- `testing`: unsigned mutable output of the pull-request workflow.
+
+The former `testing` release may remain as stale historical output. The
+pull-request workflow no longer updates it, and it is not an active channel.
 
 Consumers must verify repository and package signatures rather than treating a
 release tag's Git commit as permanent artifact identity.
@@ -145,11 +147,16 @@ not a supported path merely because it remains in the repository.
 
 ## Validation Boundaries
 
-The workflow named `Test` builds package artifacts in the same privileged
-container and publishes a shared mutable prerelease. It verifies that package
-generation and clean-chroot builds complete, subject to release-token
-permissions. It does not run an automated OpenZFS filesystem, boot, upgrade, or
-data-integrity test suite.
+The workflow named `Test` builds packages in the same privileged container and
+stores the resulting unsigned repository as a short-lived workflow artifact.
+It uses a read-only repository token, so once admitted by repository policy,
+external-fork workflows can receive the same build as pull requests from
+organization branches without publishing or mutating a release. It verifies
+that package generation and clean-chroot builds complete. A successful run may
+still include signed kernel packages reused from `failover` after an individual
+kernel-family build failure; inspect the log and record which packages were
+built or reused before citing build coverage. The workflow does not run an
+automated OpenZFS filesystem, boot, upgrade, or data-integrity test suite.
 
 The older `testing/` harness requires root, KVM/QEMU, Packer, NFS, and hard-coded
 host resources. Its guest setup is destructive and its acceptance checks are
@@ -164,3 +171,10 @@ builder deliberately imports it before enabling command tracing.
 Failover reuse depends on both the signed repository database and detached
 package signatures. Release changes must preserve those checks and the rule
 that utilities and DKMS packages cannot silently fall back after failed builds.
+
+Pull-request workflows execute unreviewed contributor code in a privileged
+container that mounts the checkout. They must not receive repository write
+permission, repository or environment secrets, a secret-bearing environment,
+persisted checkout credentials, or authority to publish to an
+organization-owned channel. Workflow approval is not a trust boundary: whether
+a fork run requires human approval depends on mutable repository policy.
