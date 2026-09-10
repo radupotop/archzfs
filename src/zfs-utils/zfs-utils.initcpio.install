@@ -74,7 +74,7 @@ build() {
 }
 
 help() {
-    cat<<HELPEOF
+    cat<<'HELPEOF'
 This hook allows you to use ZFS as your root filesystem.
 
 Command Line Setup:
