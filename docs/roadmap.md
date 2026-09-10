@@ -88,12 +88,12 @@ edge, and what support and retention users can expect.
 
 **Status: Deployed for package builds; runtime validation remains incomplete**
 
-The pull-request workflow builds package candidates and retains them briefly as
-immutable workflow artifacts tied to their individual runs. It uses no
-repository write permission, so external-fork workflows approved under
-repository policy can receive the same build validation as organization pull
-requests. These unsigned artifacts are not end-user channels and do not
-demonstrate production signing or publication behavior.
+The pull-request workflow builds package candidates and retains them for three
+days as per-run workflow artifacts that cannot be overwritten in place but can
+be deleted. It uses no repository write permission, so once admitted by
+repository policy, external-fork workflows can receive the same build validation
+as organization pull requests. These unsigned artifacts are not end-user
+channels and do not demonstrate production signing or publication behavior.
 
 `archzfs-testing` has a separate purpose: it is the disposable staging fork for
 release-infrastructure changes. Watchers, publication changes, and other CI work

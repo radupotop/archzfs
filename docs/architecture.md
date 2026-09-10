@@ -149,11 +149,14 @@ not a supported path merely because it remains in the repository.
 
 The workflow named `Test` builds packages in the same privileged container and
 stores the resulting unsigned repository as a short-lived workflow artifact.
-It uses a read-only repository token, so external-fork workflows approved under
-repository policy can receive the same build as pull requests from organization
-branches without publishing or mutating a release. It verifies that package
-generation and clean-chroot builds complete. It does not run an automated
-OpenZFS filesystem, boot, upgrade, or data-integrity test suite.
+It uses a read-only repository token, so once admitted by repository policy,
+external-fork workflows can receive the same build as pull requests from
+organization branches without publishing or mutating a release. It verifies
+that package generation and clean-chroot builds complete. A successful run may
+still include signed kernel packages reused from `failover` after an individual
+kernel-family build failure; inspect the log and record which packages were
+built or reused before citing build coverage. The workflow does not run an
+automated OpenZFS filesystem, boot, upgrade, or data-integrity test suite.
 
 The older `testing/` harness requires root, KVM/QEMU, Packer, NFS, and hard-coded
 host resources. Its guest setup is destructive and its acceptance checks are
@@ -168,3 +171,10 @@ builder deliberately imports it before enabling command tracing.
 Failover reuse depends on both the signed repository database and detached
 package signatures. Release changes must preserve those checks and the rule
 that utilities and DKMS packages cannot silently fall back after failed builds.
+
+Pull-request workflows execute unreviewed contributor code in a privileged
+container that mounts the checkout. They must not receive repository write
+permission, repository or environment secrets, a secret-bearing environment,
+persisted checkout credentials, or authority to publish to an
+organization-owned channel. Workflow approval is not a trust boundary: whether
+a fork run requires human approval depends on mutable repository policy.

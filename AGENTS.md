@@ -163,6 +163,12 @@
 - Do not run `testing/test.sh` on an unreviewed environment. Guest setup wipes
   the test VM's `/dev/vda`, depends on hard-coded NFS resources, and has
   unfinished acceptance checks.
+- Pull-request workflows execute unreviewed contributor code in a privileged
+  container. Keep them free of repository write permissions, repository or
+  environment secrets, secret-bearing environments, persisted checkout
+  credentials, and authority to publish to organization-owned channels. Do not
+  assume every fork run is approval-gated; repository policy may allow some runs
+  to start automatically.
 - Do not force-sync `archzfs-testing` until active work is preserved and
   mutating workflows are disabled. `gh repo sync --force` hard-resets its target
   branch; follow `docs/staging.md` and verify the destination repository.
