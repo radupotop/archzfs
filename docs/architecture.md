@@ -78,12 +78,14 @@ Creating a new release before renaming it gives users a meaningful publication
 date. Future fixed-name channels need to preserve both properties or replace
 them deliberately; the current sequence reduces risk but is not fully atomic.
 
-The fixed names are channels rather than immutable versions:
+The fixed release names are channels rather than immutable versions:
 
 - `experimental`: current signed public Pacman repository.
 - `failover`: signed prior/current package pool used to keep a repository
   publishable when an individual kernel-module build fails.
-- `testing`: unsigned mutable output of the pull-request workflow.
+
+The former `testing` release may remain as stale historical output. The
+pull-request workflow no longer updates it, and it is not an active channel.
 
 Consumers must verify repository and package signatures rather than treating a
 release tag's Git commit as permanent artifact identity.
@@ -145,11 +147,13 @@ not a supported path merely because it remains in the repository.
 
 ## Validation Boundaries
 
-The workflow named `Test` builds package artifacts in the same privileged
-container and publishes a shared mutable prerelease. It verifies that package
-generation and clean-chroot builds complete, subject to release-token
-permissions. It does not run an automated OpenZFS filesystem, boot, upgrade, or
-data-integrity test suite.
+The workflow named `Test` builds packages in the same privileged container and
+stores the resulting unsigned repository as a short-lived workflow artifact.
+It uses a read-only repository token, so external-fork workflows approved under
+repository policy can receive the same build as pull requests from organization
+branches without publishing or mutating a release. It verifies that package
+generation and clean-chroot builds complete. It does not run an automated
+OpenZFS filesystem, boot, upgrade, or data-integrity test suite.
 
 The older `testing/` harness requires root, KVM/QEMU, Packer, NFS, and hard-coded
 host resources. Its guest setup is destructive and its acceptance checks are

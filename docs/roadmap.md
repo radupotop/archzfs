@@ -1,6 +1,6 @@
 # ArchZFS Roadmap
 
-Last reviewed: 2026-07-12
+Last reviewed: 2026-09-10
 
 This document records the current maintainer's working direction and open design
 work. It is not a release schedule, and nothing described as staging, proposed,
@@ -86,15 +86,14 @@ edge, and what support and retention users can expect.
 
 ### CI Validation
 
-**Status: Partially deployed**
+**Status: Deployed for package builds; runtime validation remains incomplete**
 
-Package candidates should normally exist only as ephemeral workflow artifacts
-until validation succeeds. A mutable release such as `testing` may be used when
-persistent assets are technically necessary, but it is not an end-user channel
-and developers should rarely need to install from it. The current shared release
-also cannot be updated reliably by fork-originated pull requests because of
-GitHub token permissions tracked in
-[issue #586](https://github.com/archzfs/archzfs/issues/586).
+The pull-request workflow builds package candidates and retains them briefly as
+immutable workflow artifacts tied to their individual runs. It uses no
+repository write permission, so external-fork workflows approved under
+repository policy can receive the same build validation as organization pull
+requests. These unsigned artifacts are not end-user channels and do not
+demonstrate production signing or publication behavior.
 
 `archzfs-testing` has a separate purpose: it is the disposable staging fork for
 release-infrastructure changes. Watchers, publication changes, and other CI work

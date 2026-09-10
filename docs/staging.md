@@ -259,9 +259,9 @@ The production PR should state:
 - Failure paths, retries, or destructive cases that were not exercised.
 - Expected release, tag, failover, and generated-artifact impact.
 
-Normal production PR checks still apply. Their inability to mutate a shared
-release from fork-originated code is a known boundary, not a reason to grant
-untrusted code broader credentials.
+Normal production PR checks still apply. They deliberately retain package
+candidates as workflow artifacts rather than mutating a shared release; this
+boundary is not a reason to grant untrusted code broader credentials.
 
 ## Cleanup
 
